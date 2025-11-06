@@ -57,3 +57,70 @@ You should see a page similar to this:
   - Azure will validate your configuration.
   - Once validated, click <b>Create</b>.
   - <b>Download your SSH key</b> when prompted. You’ll need it later.
+
+## Part 2 - Configuring the Network Security Group (NSG)
+To allow global access (and attacks), open all inbound ports to the VM.
+
+  - In the Azure search bar, search for your NSG (it’ll look like `tpot-vm-nsg`).
+  - Go to <b>Settings</b> → <b>Inbound Security Rules</b> → <b>Add</b>.
+  - Create a rule with the following values:
+    - <b>Destination Port Ranges</b>: `*`
+    - <b>Source Port Ranges</b>: `*`
+    - <b>Priority</b>: `100`
+    - <b>Name</b>: Choose a name or use `Allow-All` 
+    - Click <b>Add</b> to apply the rule.
+   ![image](https://github.com/user-attachments/assets/de7fc173-bb22-441f-908e-bec414ad9ce7)
+⚠️ <b>Warning</b>: This configuration intentionally exposes your VM to the internet.
+Do not reuse this environment for production or personal data.
+
+## Part 3 - Connecting via SSH
+If you’re using Windows, you’ll need PuTTY and PuTTYgen to connect via SSH.
+
+  ### *1. Download & Install:*
+  - [PuTTY](https://apps.microsoft.com/detail/xpfnzksklbp7rj?hl=en-US&gl=US)
+  
+  ### *2. Convert Your Key:*
+  - In the Search bar, type and open <b>PuTTYgen</b> → <b>Click Conversions</b> → <b>Import Key</b>.
+  - Select your downloaded `.pem` file.
+  - Click <b>Save private key</b> and store it securely (this creates a `.ppk` file). 
+![image](https://github.com/user-attachments/assets/634a19c8-20b7-40e7-a8b1-7b3cf2281a57)
+
+### *3. Open PuTTY:*
+  - Enter your VM’s <b>Public IP</b> in the Host Name field.
+  - Go to <b>Connection</b> → <b>SSH</b> → <b>Auth</b> → <b>Credentials</b>.
+  - Browse and select your `.ppk` private key.
+  - Click <b>Open</b> to connect.
+
+![image](https://github.com/user-attachments/assets/2228cc63-a6d5-40da-ac42-19a74887a225)
+
+
+### *4. Login:*
+  - Enter your username when prompted
+
+## Part 4 - Installing T-Pot
+Once connected to your VM terminal, run the following command to install T-Pot:
+  - `env bash -c "$(curl -sL https://github.com/telekom-security/tpotce/raw/master/install.sh)"`
+  - When prompted, select "<b>Hive</b>" or <b>"h"</b> installation type.
+  - Create a username and password when prompted.
+  - After installation, reboot the system:
+  -   `sudo reboot`
+    
+Once the VM restarts, T-Pot services will automatically start.
+
+## Part 5 - Accessing the T-Pot Web Interface 
+After the reboot, open your web browser and visit:
+  - `https://<Your_VM_Public_IP>:64297`
+  - Log in using the credentials you created during installation.
+You should now see the T-Pot landing dashboard showing various honeypot sensors and analytics.
+![image](https://github.com/user-attachments/assets/846f0a70-ea3c-4ca1-8ee3-bb5083091f7e)
+
+## *Summary*
+Once your honeypot is live:
+  - Let it run for a few hours to collect activity.
+  - Explore dashboards to analyze:
+    - IP addresses of attackers
+    - Attack types and frequency
+    - Common ports targeted
+    - Malware samples (if any)
+After you’re done collecting data, delete the resource group `tpot-rg` to clean up all associated resources and avoid extra Azure costs.
+![imagge](https://github.com/user-attachments/assets/8389b2d4-fa49-41ee-a85d-06a41eaad189)
